@@ -1,0 +1,7 @@
+{
+ "hotkey": {
+    "type" : "keybinding",
+    "default" : "<Super>g",
+    "description" : "Global Hotkey to open the Fancy Tiles layout editor"
+ }
+}
