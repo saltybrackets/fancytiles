@@ -1,7 +1,19 @@
 {
- "hotkey": {
-    "type" : "keybinding",
-    "default" : "<Super>g",
-    "description" : "Global Hotkey to open the Fancy Tiles layout editor"
- }
+  "hotkey": {
+    "type": "keybinding",
+    "default": "<Super>g",
+    "description": "Global Hotkey to open the Fancy Tiles layout editor"
+  },
+  "enableSnappingModifiers": {
+    "type": "combobox",
+    "description": "Key modifier required to activate snapping",
+    "default": "CTRL",
+    "options": {
+      "(none)": "",
+      "CTRL": "CTRL",
+      "ALT": "ALT",
+      "SUPER": "SUPER",
+      "SHIFT": "SHIFT"
+    }
+  }
 }

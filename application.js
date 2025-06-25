@@ -65,6 +65,21 @@ function getFocusedDisplay() {
     return focusWindow.get_monitor();
 }
 
+function mapModifierSettingToModifierType(modifierSetting) {
+    switch(modifierSetting) {
+        case 'CTRL':
+            return [Clutter.ModifierType.CONTROL_MASK];
+        case 'ALT':
+            return [Clutter.ModifierType.MOD1_MASK, Clutter.ModifierType.MOD5_MASK];
+        case 'SUPER':
+            return [Clutter.ModifierType.SUPER_MASK, Clutter.ModifierType.MOD4_MASK];
+        case 'SHIFT':
+            return [Clutter.ModifierType.SHIFT_MASK];
+        default:            
+            return [];
+    }
+}
+
 // The application class is only constructed once and is the main entry 
 // of the extension.
 class Application {
@@ -166,7 +181,7 @@ class Application {
     }
 
     #enableHotkey() {
-        this.#disableHotkey();
+        this.#disableHotkey();        
         Main.keybindingManager.addHotKey('fancytiles', this.#settings.settingsData.hotkey.value, this.#toggleEditor.bind(this));
     }
 
@@ -258,7 +273,8 @@ class Application {
                 const layout = this.#readOrCreateLayoutForDisplay(displayIdx, LayoutOf2x2);
                 // reload styling
                 this.#loadThemeColors();
-                this.#windowSnapper = new WindowSnapper(displayIdx, layout, window);
+                const enableSnappingModifiers = mapModifierSettingToModifierType(this.#settings.settingsData.enableSnappingModifiers.value);                
+                this.#windowSnapper = new WindowSnapper(displayIdx, layout, window, enableSnappingModifiers);
             }
             return Clutter.EVENT_PROPAGATE;
         });
