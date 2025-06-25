@@ -737,13 +737,15 @@ class PreviewSplitOperation extends LayoutOperation {
 // the user can drag and snap a window into place
 class SnappingOperation extends LayoutOperation {
     showRegions = false;
+    #enableSnappingModifiers;
 
-    constructor(tree) {
+    constructor(tree, enableSnappingModifiers) {
         super(tree);
+        this.#enableSnappingModifiers = enableSnappingModifiers;
     }
 
     onMotion(x, y, state) {
-        var snappingEnabled = (state & Clutter.ModifierType.CONTROL_MASK);
+        var snappingEnabled = this.#enableSnappingModifiers.length == 0 || this.#enableSnappingModifiers.some((e) => (state & e));
 
         if (!snappingEnabled) {
             return this.cancel();

@@ -9,9 +9,9 @@ const { SnappingOperation } = require('./node_tree');
 
 // the WindowSnapper is used to snap a window to the given layout
 // when the user is dragging a window to a new position and it 
-// holds the <CTRL> key down the layout region where the mouse is
+// holds any of the #enableSnappingModifiers keys down the layout region where the mouse is
 // hovering over will be highlighted. when the user ends the dragging
-// whilst holding the <CTRL> key down the window will be snapped
+// whilst holding any of the #enableSnappingModifiers keys down the window will be snapped
 // to the layout region.
 class WindowSnapper {
     // UI actor
@@ -27,14 +27,20 @@ class WindowSnapper {
     // the snapping operation
     #snappingOperation;
 
+    // the modifier key to enable snapping
+    #enableSnappingModifiers;
+
     #signals = new SignalManager.SignalManager(null);
 
-    constructor(displayIdx, layout, window) {
+    constructor(displayIdx, layout, window, enableSnappingModifiers) {
         // the layout to use for the snapping operation
         this.#layout = layout;
 
         // the window that is being dragged and needs to be snapped
         this.#window = window;
+
+        // the modifier key to enable snapping
+        this.#enableSnappingModifiers = enableSnappingModifiers;
 
         // get the size of the display
         let workArea = getUsableScreenArea(displayIdx);
@@ -59,7 +65,7 @@ class WindowSnapper {
 
         // ensure the layout is correct for the snap area
         this.#layout.calculateRects(workArea.x, workArea.y, workArea.width, workArea.height);
-        this.#snappingOperation = new SnappingOperation(this.#layout);
+        this.#snappingOperation = new SnappingOperation(this.#layout, this.#enableSnappingModifiers);
 
         this.#signals.connect(this.#window, 'position-changed', this.#onWindowMoved.bind(this));
     }
