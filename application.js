@@ -86,8 +86,8 @@ class Application {
     // the active grid editor
     #gridEditor = null;
 
-    // the active window snapper
-    #windowSnapper = null;
+    // the active window snappers for each monitor
+    #windowSnappers = [];
 
     #layoutIO;
 
@@ -124,10 +124,11 @@ class Application {
             this.#gridEditor = null;
         }
 
-        if (this.#windowSnapper) {
-            this.#windowSnapper.destroy();
-            this.#windowSnapper = null;
+        // Destroy all window snappers
+        for (let snapper of this.#windowSnappers) {
+            snapper.destroy();
         }
+        this.#windowSnappers = [];
     }
 
     #loadThemeColors() {
@@ -268,13 +269,18 @@ class Application {
     #connectWindowGrabs() {
         // start snapping when the user starts moving a window
         this.#signals.connect(global.display, 'grab-op-begin', (display, screen, window, op) => {
-            if (op === Meta.GrabOp.MOVING && window.window_type === Meta.WindowType.NORMAL) {
-                const displayIdx = window.get_monitor();
-                const layout = this.#readOrCreateLayoutForDisplay(displayIdx, LayoutOf2x2);
+            if (op === Meta.GrabOp.MOVING && window.window_type === Meta.WindowType.NORMAL) {                                
                 // reload styling
                 this.#loadThemeColors();
-                const enableSnappingModifiers = mapModifierSettingToModifierType(this.#settings.settingsData.enableSnappingModifiers.value);                
-                this.#windowSnapper = new WindowSnapper(displayIdx, layout, window, enableSnappingModifiers);
+                const enableSnappingModifiers = mapModifierSettingToModifierType(this.#settings.settingsData.enableSnappingModifiers.value);
+                
+                // Create WindowSnapper for each monitor
+                const nMonitors = global.display.get_n_monitors();
+                for (let i = 0; i < nMonitors; i++) {
+                    const layout = this.#readOrCreateLayoutForDisplay(i, LayoutOf2x2);
+                    const snapper = new WindowSnapper(i, layout, window, enableSnappingModifiers);
+                    this.#windowSnappers.push(snapper);
+                }
             }
             return Clutter.EVENT_PROPAGATE;
         });
@@ -282,9 +288,12 @@ class Application {
         // stop snapping when the user stops moving a window
         this.#signals.connect(global.display, 'grab-op-end', (display, screen, window, op) => {
             if (op === Meta.GrabOp.MOVING && window.window_type === Meta.WindowType.NORMAL) {
-                this.#windowSnapper.finalize();
-                this.#windowSnapper.destroy();
-                this.#windowSnapper = null;
+                // Finalize and destroy all window snappers
+                for (let snapper of this.#windowSnappers) {
+                    snapper.finalize();
+                    snapper.destroy();
+                }
+                this.#windowSnappers = [];
             }
             return Clutter.EVENT_PROPAGATE;
         });

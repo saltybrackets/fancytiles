@@ -5,9 +5,9 @@
     "uuid": "fancytiles@basgeertsema",
     "name": "Fancy Tiles",
     "description": "Snap your windows to a flexible layout",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "multiversion": false,
     "url": "https://github.com/basgeertsema/fancytiles",
     "author": "Bas Geertsema",
-    "last-edited": 1744615144
+    "last-edited": 1751367688
 }
