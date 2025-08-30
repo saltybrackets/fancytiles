@@ -159,6 +159,14 @@ class Application {
             };
         }
 
+        // Override with prominent green color for dividers
+        this.#colors.border = {
+            r: 0,
+            g: 1,
+            b: 0,
+            a: 1
+        };
+
         // add the snap style class to get the highlighted colors
         stylingActor.add_style_class_name('snap');
 
