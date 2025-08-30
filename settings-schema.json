@@ -15,5 +15,10 @@
       "SUPER": "SUPER",
       "SHIFT": "SHIFT"
     }
+  },
+  "borderColor": {
+    "type": "colorchooser",
+    "default": "#00FF00",
+    "description": "Color for dividers and borders"
   }
 }

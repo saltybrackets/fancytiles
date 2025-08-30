@@ -80,6 +80,19 @@ function mapModifierSettingToModifierType(modifierSetting) {
     }
 }
 
+function parseRgbColorToRgba(rgbColor) {
+    const rgbMatch = rgbColor.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
+    if (rgbMatch) {
+        return {
+            r: parseInt(rgbMatch[1]) / 255,
+            g: parseInt(rgbMatch[2]) / 255,
+            b: parseInt(rgbMatch[3]) / 255,
+            a: 1
+        };
+    }
+    return { r: 0, g: 1, b: 0, a: 1 };
+}
+
 // The application class is only constructed once and is the main entry 
 // of the extension.
 class Application {
@@ -109,6 +122,7 @@ class Application {
 
         this.#settings = new Settings.ExtensionSettings(this, uuid);
         this.#settings.bindProperty(Settings.BindingDirection.IN, 'hotkey', 'hotkey', this.#enableHotkey);
+        this.#settings.bindProperty(Settings.BindingDirection.IN, 'borderColor', 'borderColor', this.#loadThemeColors.bind(this));
 
         this.#loadThemeColors();
         this.#enableHotkey();
@@ -158,6 +172,9 @@ class Application {
                 a: borderColor.alpha / 255
             };
         }
+
+        // Use configurable border color
+        this.#colors.border = parseRgbColorToRgba(this.#settings.settingsData.borderColor.value);
 
         // add the snap style class to get the highlighted colors
         stylingActor.add_style_class_name('snap');
