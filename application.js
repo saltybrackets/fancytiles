@@ -80,48 +80,16 @@ function mapModifierSettingToModifierType(modifierSetting) {
     }
 }
 
-function parseColorToRgba(colorValue) {
-    global.log(`FancyTiles: parseColorToRgba input = ${colorValue}, type = ${typeof colorValue}`);
-    
-    if (!colorValue) {
-        global.log('FancyTiles: No color value provided, using default green');
-        return { r: 0, g: 1, b: 0, a: 1 };
-    }
-    
-    // If it's already an object with rgba properties
-    if (typeof colorValue === 'object' && colorValue.r !== undefined) {
-        return colorValue;
-    }
-    
-    let colorStr = String(colorValue);
-    
-    // Handle rgba() format like "rgba(255, 0, 0, 1.0)"
-    const rgbaMatch = colorStr.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+))?\s*\)/);
-    if (rgbaMatch) {
-        const result = {
-            r: parseInt(rgbaMatch[1]) / 255,
-            g: parseInt(rgbaMatch[2]) / 255,
-            b: parseInt(rgbaMatch[3]) / 255,
-            a: rgbaMatch[4] ? parseFloat(rgbaMatch[4]) : 1
+function parseRgbColorToRgba(rgbColor) {
+    const rgbMatch = rgbColor.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/);
+    if (rgbMatch) {
+        return {
+            r: parseInt(rgbMatch[1]) / 255,
+            g: parseInt(rgbMatch[2]) / 255,
+            b: parseInt(rgbMatch[3]) / 255,
+            a: 1
         };
-        global.log(`FancyTiles: parsed rgba format = ${JSON.stringify(result)}`);
-        return result;
     }
-    
-    // Handle hex format like "#00FF00"
-    if (colorStr.startsWith('#')) {
-        const hex = colorStr.replace('#', '');
-        const result = {
-            r: parseInt(hex.substring(0, 2), 16) / 255,
-            g: parseInt(hex.substring(2, 4), 16) / 255,
-            b: parseInt(hex.substring(4, 6), 16) / 255,
-            a: hex.length === 8 ? parseInt(hex.substring(6, 8), 16) / 255 : 1
-        };
-        global.log(`FancyTiles: parsed hex format = ${JSON.stringify(result)}`);
-        return result;
-    }
-    
-    global.log(`FancyTiles: Could not parse color format, using default green`);
     return { r: 0, g: 1, b: 0, a: 1 };
 }
 
@@ -206,9 +174,7 @@ class Application {
         }
 
         // Use configurable border color
-        const borderColorValue = this.#settings.settingsData.borderColor.value;
-        global.log(`FancyTiles: borderColor value = ${borderColorValue}, type = ${typeof borderColorValue}`);
-        this.#colors.border = parseColorToRgba(borderColorValue);
+        this.#colors.border = parseRgbColorToRgba(this.#settings.settingsData.borderColor.value);
 
         // add the snap style class to get the highlighted colors
         stylingActor.add_style_class_name('snap');
